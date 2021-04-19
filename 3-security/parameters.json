@@ -1,0 +1,18 @@
+[
+  {
+    "ParameterKey": "InfrastructureName", 
+    "ParameterValue": "<infrastructure-name>" 
+  },
+  {
+    "ParameterKey": "VpcCidr", 
+    "ParameterValue": "10.0.0.0/16" 
+  },
+  {
+    "ParameterKey": "PrivateSubnets", 
+    "ParameterValue": "<vpc-output-PrivateSubnetIds>" 
+  },
+  {
+    "ParameterKey": "VpcId", 
+    "ParameterValue": "<vpc-output-VpcId>" 
+  }
+]

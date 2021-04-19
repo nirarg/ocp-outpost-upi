@@ -1,0 +1,15 @@
+Launch the template:
+
+aws cloudformation create-stack --stack-name nargaman-cluster-security --template-body file://template.yaml --parameters file://parameters.json --capabilities CAPABILITY_NAMED_IAM
+
+
+Confirm that the template components exist:
+
+aws cloudformation describe-stacks --stack-name nargaman-cluster-security
+
+
+Output:
+* MasterSecurityGroupId
+* WorkerSecurityGroupId
+* MasterInstanceProfile
+* WorkerInstanceProfile

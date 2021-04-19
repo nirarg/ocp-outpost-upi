@@ -1,0 +1,8 @@
+Launch the teplate:
+
+aws cloudformation create-stack --stack-name nargaman-cluster-masters --template-body file://template.yaml --parameters file://parameters.json
+
+
+Confirm that the template components exist:
+
+aws cloudformation describe-stacks --stack-name nargaman-cluster-masters

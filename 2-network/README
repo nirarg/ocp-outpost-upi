@@ -1,0 +1,14 @@
+aws cloudformation create-stack --stack-name nargaman-cluster-network --template-body file://template.yaml --parameters file://parameters.json --capabilities CAPABILITY_NAMED_IAM
+
+aws cloudformation describe-stacks --stack-name nargaman-cluster-network
+
+
+Output:
+* PrivateHostedZoneId
+* ExternalApiLoadBalancerName
+* InternalApiLoadBalancerName
+* ApiServerDnsName
+* RegisterNlbIpTargetsLambda
+* ExternalApiTargetGroupArn
+* InternalApiTargetGroupArn
+* InternalServiceTargetGroupArn

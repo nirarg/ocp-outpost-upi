@@ -1,0 +1,29 @@
+Create the bucket:
+
+aws s3 mb s3://<cluster-name>-infra
+
+
+Upload the bootstrap.ign Ignition config file to the bucket:
+
+aws s3 cp bootstrap.ign s3://<cluster-name>-infra/bootstrap.ign
+
+
+Verify that the file uploaded:
+
+aws s3 ls s3://<cluster-name>-infra/
+
+
+Launch the template:
+
+aws cloudformation create-stack --stack-name nargaman-cluster-bootstrap --template-body file://template.yaml --parameters file://parameters.json --capabilities CAPABILITY_NAMED_IAM
+
+
+Confirm that the template components exist:
+
+aws cloudformation describe-stacks --stack-name nargaman-cluster-bootstrap
+
+
+Outputs:
+* BootstrapInstanceId
+* BootstrapPublicIp
+* BootstrapPrivateIp

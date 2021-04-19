@@ -1,0 +1,50 @@
+[
+  {
+    "ParameterKey": "InfrastructureName", 
+    "ParameterValue": "<infrastructure_name>" 
+  },
+  {
+    "ParameterKey": "RhcosAmi", 
+    "ParameterValue": "<ami-id>" 
+  },
+  {
+    "ParameterKey": "AllowedBootstrapSshCidr", 
+    "ParameterValue": "0.0.0.0/0" 
+  },
+  {
+    "ParameterKey": "PublicSubnet", 
+    "ParameterValue": "<vpc-output-PublicSubnetIds>" 
+  },
+  {
+    "ParameterKey": "MasterSecurityGroupId", 
+    "ParameterValue": "<security-output-MasterSecurityGroupId>" 
+  },
+  {
+    "ParameterKey": "VpcId", 
+    "ParameterValue": "<vpc-output-VpcId>" 
+  },
+  {
+    "ParameterKey": "BootstrapIgnitionLocation", 
+    "ParameterValue": "s3://<cluster-name>-infra/bootstrap.ign" 
+  },
+  {
+    "ParameterKey": "AutoRegisterELB", 
+    "ParameterValue": "yes" 
+  },
+  {
+    "ParameterKey": "RegisterNlbIpTargetsLambdaArn", 
+    "ParameterValue": "<network-output-RegisterNlbIpTargetsLambda>" 
+  },
+  {
+    "ParameterKey": "ExternalApiTargetGroupArn", 
+    "ParameterValue": "<network-output-ExternalApiTargetGroupArn>" 
+  },
+  {
+    "ParameterKey": "InternalApiTargetGroupArn", 
+    "ParameterValue": "<network-output-InternalApiTargetGroupArn>" 
+  },
+  {
+    "ParameterKey": "InternalServiceTargetGroupArn", 
+    "ParameterValue": "<network-output-InternalServiceTargetGroupArn>"
+  }
+]
