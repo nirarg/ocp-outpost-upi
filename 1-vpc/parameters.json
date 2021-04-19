@@ -4,11 +4,15 @@
     "ParameterValue": "10.0.0.0/16" 
   },
   {
-    "ParameterKey": "AvailabilityZoneCount", 
-    "ParameterValue": "1" 
+    "ParameterKey": "AvailabilityZone", 
+    "ParameterValue": "<availability-zone>" 
   },
   {
     "ParameterKey": "SubnetBits", 
     "ParameterValue": "12" 
+  },
+  {
+    "ParameterKey": "OutpostArn", 
+    "ParameterValue": "<outpost-arn>" 
   }
 ]

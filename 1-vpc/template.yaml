@@ -22,6 +22,14 @@ Parameters:
     Default: 12
     Description: "Size of each subnet to create within the availability zones. (Min: 5 = /27, Max: 13 = /19)"
     Type: Number
+  AvailabilityZone:
+    ConstraintDescription: The availbility zone used by the outpost instance
+    Description: AWS Outpost Availability Zone.
+    Type: String
+  OutpostArn:
+    ConstraintDescription: The Amazon Resource Name (ARN) of the Outpost.
+    Description: The Amazon Resource Name (ARN) of the Outpost.
+    Type: String
 
 Metadata:
   AWS::CloudFormation::Interface:
@@ -32,20 +40,19 @@ Metadata:
       - VpcCidr
       - SubnetBits
     - Label:
-        default: "Availability Zones"
+        default: "Availability Zone"
       Parameters:
-      - AvailabilityZoneCount
+      - AvailabilityZone
+      - OutpostArn
     ParameterLabels:
-      AvailabilityZoneCount:
-        default: "Availability Zone Count"
       VpcCidr:
         default: "VPC CIDR"
       SubnetBits:
         default: "Bits Per Subnet"
-
-Conditions:
-  DoAz3: !Equals [3, !Ref AvailabilityZoneCount]
-  DoAz2: !Or [!Equals [2, !Ref AvailabilityZoneCount], Condition: DoAz3]
+      AvailabilityZone:
+        default: "Availability Zone"
+      OutpostArn:
+        default: "Outpost Arn"
 
 Resources:
   VPC:
@@ -59,27 +66,8 @@ Resources:
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Select [0, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
-      AvailabilityZone: !Select
-      - 0
-      - Fn::GetAZs: !Ref "AWS::Region"
-  PublicSubnet2:
-    Type: "AWS::EC2::Subnet"
-    Condition: DoAz2
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Select [1, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
-      AvailabilityZone: !Select
-      - 1
-      - Fn::GetAZs: !Ref "AWS::Region"
-  PublicSubnet3:
-    Type: "AWS::EC2::Subnet"
-    Condition: DoAz3
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Select [2, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
-      AvailabilityZone: !Select
-      - 2
-      - Fn::GetAZs: !Ref "AWS::Region"
+      AvailabilityZone: !Ref AvailabilityZone
+      OutpostArn: !Ref OutpostArn
   InternetGateway:
     Type: "AWS::EC2::InternetGateway"
   GatewayToInternet:
@@ -103,26 +91,13 @@ Resources:
     Properties:
       SubnetId: !Ref PublicSubnet
       RouteTableId: !Ref PublicRouteTable
-  PublicSubnetRouteTableAssociation2:
-    Type: "AWS::EC2::SubnetRouteTableAssociation"
-    Condition: DoAz2
-    Properties:
-      SubnetId: !Ref PublicSubnet2
-      RouteTableId: !Ref PublicRouteTable
-  PublicSubnetRouteTableAssociation3:
-    Condition: DoAz3
-    Type: "AWS::EC2::SubnetRouteTableAssociation"
-    Properties:
-      SubnetId: !Ref PublicSubnet3
-      RouteTableId: !Ref PublicRouteTable
   PrivateSubnet:
     Type: "AWS::EC2::Subnet"
     Properties:
       VpcId: !Ref VPC
       CidrBlock: !Select [3, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
-      AvailabilityZone: !Select
-      - 0
-      - Fn::GetAZs: !Ref "AWS::Region"
+      AvailabilityZone: !Ref AvailabilityZone
+      OutpostArn: !Ref OutpostArn
   PrivateRouteTable:
     Type: "AWS::EC2::RouteTable"
     Properties:
@@ -154,96 +129,6 @@ Resources:
       DestinationCidrBlock: 0.0.0.0/0
       NatGatewayId:
         Ref: NAT
-  PrivateSubnet2:
-    Type: "AWS::EC2::Subnet"
-    Condition: DoAz2
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Select [4, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
-      AvailabilityZone: !Select
-      - 1
-      - Fn::GetAZs: !Ref "AWS::Region"
-  PrivateRouteTable2:
-    Type: "AWS::EC2::RouteTable"
-    Condition: DoAz2
-    Properties:
-      VpcId: !Ref VPC
-  PrivateSubnetRouteTableAssociation2:
-    Type: "AWS::EC2::SubnetRouteTableAssociation"
-    Condition: DoAz2
-    Properties:
-      SubnetId: !Ref PrivateSubnet2
-      RouteTableId: !Ref PrivateRouteTable2
-  NAT2:
-    DependsOn:
-    - GatewayToInternet
-    Type: "AWS::EC2::NatGateway"
-    Condition: DoAz2
-    Properties:
-      AllocationId:
-        "Fn::GetAtt":
-        - EIP2
-        - AllocationId
-      SubnetId: !Ref PublicSubnet2
-  EIP2:
-    Type: "AWS::EC2::EIP"
-    Condition: DoAz2
-    Properties:
-      Domain: vpc
-  Route2:
-    Type: "AWS::EC2::Route"
-    Condition: DoAz2
-    Properties:
-      RouteTableId:
-        Ref: PrivateRouteTable2
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId:
-        Ref: NAT2
-  PrivateSubnet3:
-    Type: "AWS::EC2::Subnet"
-    Condition: DoAz3
-    Properties:
-      VpcId: !Ref VPC
-      CidrBlock: !Select [5, !Cidr [!Ref VpcCidr, 6, !Ref SubnetBits]]
-      AvailabilityZone: !Select
-      - 2
-      - Fn::GetAZs: !Ref "AWS::Region"
-  PrivateRouteTable3:
-    Type: "AWS::EC2::RouteTable"
-    Condition: DoAz3
-    Properties:
-      VpcId: !Ref VPC
-  PrivateSubnetRouteTableAssociation3:
-    Type: "AWS::EC2::SubnetRouteTableAssociation"
-    Condition: DoAz3
-    Properties:
-      SubnetId: !Ref PrivateSubnet3
-      RouteTableId: !Ref PrivateRouteTable3
-  NAT3:
-    DependsOn:
-    - GatewayToInternet
-    Type: "AWS::EC2::NatGateway"
-    Condition: DoAz3
-    Properties:
-      AllocationId:
-        "Fn::GetAtt":
-        - EIP3
-        - AllocationId
-      SubnetId: !Ref PublicSubnet3
-  EIP3:
-    Type: "AWS::EC2::EIP"
-    Condition: DoAz3
-    Properties:
-      Domain: vpc
-  Route3:
-    Type: "AWS::EC2::Route"
-    Condition: DoAz3
-    Properties:
-      RouteTableId:
-        Ref: PrivateRouteTable3
-      DestinationCidrBlock: 0.0.0.0/0
-      NatGatewayId:
-        Ref: NAT3
   S3Endpoint:
     Type: AWS::EC2::VPCEndpoint
     Properties:
@@ -259,8 +144,6 @@ Resources:
       RouteTableIds:
       - !Ref PublicRouteTable
       - !Ref PrivateRouteTable
-      - !If [DoAz2, !Ref PrivateRouteTable2, !Ref "AWS::NoValue"]
-      - !If [DoAz3, !Ref PrivateRouteTable3, !Ref "AWS::NoValue"]
       ServiceName: !Join
       - ''
       - - com.amazonaws.
@@ -277,12 +160,12 @@ Outputs:
     Value:
       !Join [
         ",",
-        [!Ref PublicSubnet, !If [DoAz2, !Ref PublicSubnet2, !Ref "AWS::NoValue"], !If [DoAz3, !Ref PublicSubnet3, !Ref "AWS::NoValue"]]
+        [!Ref PublicSubnet]
       ]
   PrivateSubnetIds:
     Description: Subnet IDs of the private subnets.
     Value:
       !Join [
         ",",
-        [!Ref PrivateSubnet, !If [DoAz2, !Ref PrivateSubnet2, !Ref "AWS::NoValue"], !If [DoAz3, !Ref PrivateSubnet3, !Ref "AWS::NoValue"]]
+        [!Ref PrivateSubnet]
       ]
