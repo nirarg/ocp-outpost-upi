@@ -1,5 +1,13 @@
 [
   {
+    "ParameterKey": "ClusterName", 
+    "ParameterValue": "<cluster_name>" 
+  },
+  {
+    "ParameterKey": "HostedZoneName", 
+    "ParameterValue": "<base_domain>" 
+  },
+  {
     "ParameterKey": "InfrastructureName", 
     "ParameterValue": "<infrastructure_name>" 
   },

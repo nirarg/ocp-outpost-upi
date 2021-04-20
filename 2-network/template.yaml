@@ -2,6 +2,17 @@ AWSTemplateFormatVersion: 2010-09-09
 Description: Template for OpenShift Cluster Network Elements (Route53 & LBs)
 
 Parameters:
+  ClusterName:
+    AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
+    MaxLength: 27
+    MinLength: 1
+    ConstraintDescription: Cluster name must be alphanumeric, start with a letter, and have a maximum of 27 characters.
+    Description: A short, representative cluster name to use for host names and other identifying names.
+    Type: String
+  HostedZoneName:
+    Description: The Route53 zone to register the targets with, such as example.com. Omit the trailing period.
+    Type: String
+    Default: "example.com"
   InfrastructureName:
     AllowedPattern: ^([a-zA-Z][a-zA-Z0-9\-]{0,26})$
     MaxLength: 27
@@ -25,7 +36,13 @@ Metadata:
     - Label:
         default: "Cluster Information"
       Parameters:
+      - ClusterName
       - InfrastructureName
+    - Label:
+        default: "DNS"
+      Parameters:
+      - HostedZoneName
+      - HostedZoneId
     - Label:
         default: "Network Configuration"
       Parameters:
@@ -33,6 +50,10 @@ Metadata:
       - PublicSubnets
       - PrivateSubnets
     ParameterLabels:
+      ClusterName:
+        default: "Cluster Name"
+      HostedZoneName:
+        default: "Public Hosted Zone Name"
       InfrastructureName:
         default: "Infrastructure Name"
       VpcId:
@@ -71,6 +92,19 @@ Resources:
         Ref: ExtApiElb
       Port: 6443
       Protocol: HTTPS
+  
+  ExternalApiCertificate: 
+    Type: AWS::CertificateManager::Certificate
+    Properties: 
+      DomainName: !Join [".", ["api", !Ref ClusterName, !Ref HostedZoneName]]
+      ValidationMethod: DNS
+
+  ExternalApiListenerCertificate:
+    Type: AWS::ElasticLoadBalancingV2::ListenerCertificate
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref ExternalApiCertificate
+      ListenerArn: !Ref ExternalApiListener
 
   ExternalApiTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -95,6 +129,19 @@ Resources:
         Ref: IntApiElb
       Port: 6443
       Protocol: HTTPS
+  
+  InternalApiCertificate: 
+    Type: AWS::CertificateManager::Certificate
+    Properties: 
+      DomainName: !Join [".", ["api-int", !Ref ClusterName, !Ref HostedZoneName]]
+      ValidationMethod: DNS
+
+  InternalApiListenerCertificate:
+    Type: AWS::ElasticLoadBalancingV2::ListenerCertificate
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref InternalApiCertificate
+      ListenerArn: !Ref InternalApiListener
 
   InternalApiTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -119,6 +166,19 @@ Resources:
         Ref: IntApiElb
       Port: 22623
       Protocol: HTTPS
+  
+  InternalServiceCertificate: 
+    Type: AWS::CertificateManager::Certificate
+    Properties: 
+      DomainName: !Join [".", ["api-int", !Ref ClusterName, !Ref HostedZoneName]]
+      ValidationMethod: DNS
+
+  InternalServiceListenerCertificate:
+    Type: AWS::ElasticLoadBalancingV2::ListenerCertificate
+    Properties:
+      Certificates:
+        - CertificateArn: !Ref InternalServiceCertificate
+      ListenerArn: !Ref InternalServiceInternalListener
 
   InternalServiceTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
