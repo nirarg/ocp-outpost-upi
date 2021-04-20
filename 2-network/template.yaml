@@ -70,13 +70,13 @@ Resources:
       LoadBalancerArn:
         Ref: ExtApiElb
       Port: 6443
-      Protocol: TCP
+      Protocol: HTTPS
 
   ExternalApiTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 6443
-      Protocol: TCP
+      Protocol: HTTPS
       TargetType: ip
       VpcId:
         Ref: VpcId
@@ -94,13 +94,13 @@ Resources:
       LoadBalancerArn:
         Ref: IntApiElb
       Port: 6443
-      Protocol: TCP
+      Protocol: HTTPS
 
   InternalApiTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 6443
-      Protocol: TCP
+      Protocol: HTTPS
       TargetType: ip
       VpcId:
         Ref: VpcId
@@ -118,13 +118,13 @@ Resources:
       LoadBalancerArn:
         Ref: IntApiElb
       Port: 22623
-      Protocol: TCP
+      Protocol: HTTPS
 
   InternalServiceTargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
     Properties:
       Port: 22623
-      Protocol: TCP
+      Protocol: HTTPS
       TargetType: ip
       VpcId:
         Ref: VpcId
