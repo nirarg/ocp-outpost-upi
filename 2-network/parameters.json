@@ -1,19 +1,7 @@
 [
   {
-    "ParameterKey": "ClusterName", 
-    "ParameterValue": "<cluster_name>" 
-  },
-  {
     "ParameterKey": "InfrastructureName", 
     "ParameterValue": "<infrastructure_name>" 
-  },
-  {
-    "ParameterKey": "HostedZoneId", 
-    "ParameterValue": "<aws-console-Route53PublicZoneID>" 
-  },
-  {
-    "ParameterKey": "HostedZoneName", 
-    "ParameterValue": "<base_domain>" 
   },
   {
     "ParameterKey": "PublicSubnets", 
